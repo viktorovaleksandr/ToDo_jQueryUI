@@ -135,7 +135,7 @@ class TodoLogic {
             });
 
          const listElementId = ulTodoElement.querySelector(`li[data-id="${id}"]`);
-       
+
          listElementId.replaceWith(renderTodo(updateTodo));
          cleanForm($todoEditForm);
          $editModal.dialog('close');
@@ -227,7 +227,7 @@ function createListElement(todo) {
 	}  
 
 	ulTodoElement.prepend(list);
-	list.insertAdjacentHTML('beforeend', closeButton);
+	return list.insertAdjacentHTML('beforeend', closeButton);
 }
 
 // FORM UTILS
@@ -240,6 +240,14 @@ function getTodoFormData($form) {
    }
 }
 
+function	checkedTodo(event) {
+	const target = $( event.target );
+	if (target.is( "input" )) {
+   	const checked = target.is(":checked");
+   	TodoLogic.updateStatusTodo(checked);
+   }
+}
+
 function editTodo(event) {
    const listElement = event.target.closest('li');
    todosRopository.selectedTodoId = parseInt(listElement.dataset.id, 10);
@@ -247,14 +255,6 @@ function editTodo(event) {
    
    setEditTodoFormData(todo);
    $editModal.dialog('open');
-}
-
-function	checkedTodo(event) {
-	const target = $( event.target );
-	if (target.is( "#checkbox-1" )) {
-   	const checked = target.is( ":checked" );
-   	TodoLogic.updateStatusTodo(checked);
-   }
 }
 
 function setEditTodoFormData(todo) {
