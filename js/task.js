@@ -11,7 +11,7 @@ const $todoEditForm = $('form[name="edit-todo"]');
 
 const ulTodoElement = document.querySelector('.js-list-todo');
 const $ulTodoElement = $('.js-list-todo');
-const $inputCheckbox = $('#background-color');
+const $inputCheckbox = $('#checkbox-1');
 
 class TodoRequests {
 	static sendGetTodosRequest() {
@@ -111,7 +111,6 @@ class TodoLogic {
    	const listElementId = ulTodoElement.querySelector(`li[data-id="${id}"]`);
  
 		if (checked) todo.completed = !todo.completed;
-	   listElementId.classList.toggle('list-group-item-info');
 
 		const promise = TodoRequests.sendPutTodoRequest(id,todo);
 		promise.then(todo => { 
@@ -252,7 +251,7 @@ function editTodo(event) {
 
 function	checkedTodo(event) {
 	const target = $( event.target );
-	if (target.is( ".brand-toggle" )) {
+	if (target.is( "#checkbox-1" )) {
    	const checked = target.is( ":checked" );
    	TodoLogic.updateStatusTodo(checked);
    }
@@ -288,9 +287,5 @@ function init() {
 }
 init();
 
-// 1 при нажатии на edit статус остаеться false 
-// 2 вставляет undefain после обновления
-
-// 3 на новой сущности не меняет статус
 
 
