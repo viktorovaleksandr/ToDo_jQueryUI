@@ -14,41 +14,33 @@
 </head>
 <body>
   <div class="container col-sm-6">
-    <h1 class="display-1 text-center">todo<strong>jQueryUI</strong><i class="bi bi-pencil"></i></h1>
+    <h1 class="display-1 text-center"><strong>jQueryUI</strong><i class="bi bi-pencil"></i></h1>
 
-    <button type="button" class="js-show-add-modal btn btn-primary">Добавить</button>
+    <button type="button" class="js-show-add-modal btn btn-outline-success btn-lg ">Open Add Modal</button>
     
-    <div class="js-add-modal toggle-wrap" title="add todo">
-      
-      <form name="todo" class="input-group">
+    <div class="js-add-modal " title="Add Todo Modal">
+      <form name="add-todo" class="input-group">
         <label class="form-label">Todo Name</label>
         <input name="name" class="js-input-todo" placeholder="Insert your task here..." value="">
-
-        <label for="checkbox-2">Done
-          <input type="checkbox" name="checkbox-1" id="checkbox-2">
-        </label>
-        
         <div class="mt-3">
-          <button type="button" class="js-add-todo btn btn-dark btn-lg rounded-pill">Add</button>
+          <button type="button" class="js-add-todo btn btn-outline-success btn-lg">Add</button>
         </div>
       </form>
     </div>
 
-    <div class="js-edit-modal toggle-wrap" title="edit todo">
+    <div class="js-edit-modal" title="Edit ToDo Modal">
       <form name="edit-todo" class="input-group">
-        <label class="form-label">Todo Name</label>
+        <label class="form-label"></label>
         <input name="name" class="js-input-todo" placeholder="Insert your task here..." value="">
-
-        <label for="checkbox-1">Done</label>
-        <input type="checkbox" id="checkbox-1">
-
-        <div class="mt-3">
-          <button type="button" class="js-update btn btn-primary">Обновить</button>
-          <button type="button" class="js-cancel btn btn-secondary">Отмена</button>
+        <label for="js-checkbox"><strong>Is Done</strong>
+          <input type="checkbox" id="js-checkbox">
+        </label>
+        <div class="mt-4">
+          <button type="button" class="js-update btn btn-outline-success btn-lg">Update</button>
+          <button type="button" class="js-cancel btn btn-outline-danger btn-lg">Cancel</button>
         </div>
       </form>
     </div>
-
     <div class="rounded card-body fst-italic">
       <ul class="js-list-todo list-group list-unstyled list-group-flush">
       </ul>

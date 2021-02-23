@@ -1,17 +1,12 @@
 const $addModal = $('.js-add-modal');
 const $editModal = $('.js-edit-modal');
-
 const $addTodoModalButton = $('.js-show-add-modal');
 const $updateButton = $('.js-update');
-const $addButton =  $('.js-add-todo');
-const $cancelButton =  $('.js-cancel');
-
-const $todoAddForm = $('form[name="todo"]');
+const $addButton = $('.js-add-todo');
+const $cancelButton = $('.js-cancel');
+const $todoAddForm = $('form[name="add-todo"]');
 const $todoEditForm = $('form[name="edit-todo"]');
-
-const ulTodoElement = document.querySelector('.js-list-todo');
 const $ulTodoElement = $('.js-list-todo');
-const $inputEditCheckbox = $('#checkbox-1');
 
 class TodoRequests {
 	static sendGetTodosRequest() {
@@ -104,11 +99,11 @@ class TodoLogic {
 			$addModal.dialog("close");
 		});
 	}
-// ----------------------------------------------------
+// =========================разделить на функции
 	static updateTodo() {
       const todo = getTodoFormData($todoEditForm);
       const id = todosRopository.selectedTodoId;
-      const $checkbox = $todoEditForm[0]['checkbox-1'];
+      const $formCheckbox = $todoEditForm[0]['js-checkbox'];
 
       const promise = TodoRequests.sendPutTodoRequest(id, todo); 
       promise.then(editTodo => {
@@ -122,23 +117,22 @@ class TodoLogic {
                return todo;
             });
 
-         if ($($checkbox).is(':checked')) editTodo.completed = !editTodo.completed;
-
-         const $listElementId = $(ulTodoElement).find(`li[data-id="${id}"]`);
-
+         if ($($formCheckbox).is(':checked')) editTodo.completed = !editTodo.completed;
+        
+         const $listElementId = $($ulTodoElement).find(`li[data-id="${id}"]`);
          $listElementId.replaceWith(renderTodo(editTodo));
          cleanForm($todoEditForm);
          $editModal.dialog('close');
       });
    }
-// ----------------------------------------------------
+// =========================
 	static deleteTodo(event) {
 		const listElement = event.target.closest('li');
 		const id = parseInt(listElement.dataset.id, 10);
 
 		const promise = TodoRequests.sendDeleteTodoRequest(id);
 		promise.then(() => {
-			const $listElementId = $(ulTodoElement).find(`li[data-id="${id}"]`);
+			const $listElementId = $($ulTodoElement).find(`li[data-id="${id}"]`);
 			$listElementId.remove();
 			todosRopository.todos = todosRopository.todos.filter(todo => todo.id !== id);
 		});
@@ -164,13 +158,11 @@ class TodoEvent {
 		});	
 	}
 
-	static createDeleteTodoEventListener() {
-		ulTodoElement.addEventListener('click', (event) => {
-	   	if(event.target.classList.contains('bi-trash-fill')) {
-	      	TodoLogic.deleteTodo(event);
-	      	event.stopPropagation();
-	    	}
-	   },true)
+	static createDeleteTodoEventListener() {	
+		$ulTodoElement.delegate('i',"click",function(event) {
+			event.stopPropagation();
+	      TodoLogic.deleteTodo(event);
+	   })
 	}
 
 	static createEditTodoEventListener() {	
@@ -191,27 +183,25 @@ class TodoEvent {
 // RENDER 
 
 function renderTodos(todos) {
-	const lists = todos.map((todos) => createListElement(todos));
+	$(todos).map(function() {createListElement(this)});
 }
 
 function renderTodo(todo) {
-	const list = createListElement(todo);	
+	createListElement(todo);	
 }
 
 function createListElement(todo) {
-	const list = document.createElement('li');
-	list.className = `list-group-item list-group-item-action d-flex 
-	justify-content-between rounded-pill list-group-item-secondary`;
-	list.dataset.id = todo.id;
-	list.textContent = todo.title;
-	const closeButton = `<i class="bi bi-trash-fill"></i>`;
-	
-	if (todo.completed) {
-		list.classList.add('list-group-item-info');
-	}  
+	const $listElement = $(`
+     <li data-id="${todo.id}" completed:"${todo.completed}" class="list-group-item list-group-item-action d-flex justify-content-between rounded-pill list-group-item-secondary">
+      	${todo.title}
+      	<i class="bi bi-trash-fill"></i>
+      </li>
+   `);
 
-	ulTodoElement.prepend(list);
-	list.insertAdjacentHTML('beforeend', closeButton);
+	if (todo.completed) {
+		$listElement.removeClass('list-group-item-secondary').addClass('list-group-item-info');
+	}  
+	$ulTodoElement.prepend($listElement);
 }
 
 // FORM UTILS
@@ -224,6 +214,13 @@ function getTodoFormData($form) {
    }
 }
 
+function setEditTodoFormData(todo) {
+   $todoEditForm[0].name.value = todo.title;	
+   todo.completed
+   ?$todoEditForm[0]['js-checkbox'].setAttribute("checked",'')
+   :$todoEditForm[0]['js-checkbox'].removeAttribute('checked');		  
+}
+
 function editTodo(event) {
    const listElement = event.target.closest('li');
    todosRopository.selectedTodoId = parseInt(listElement.dataset.id, 10);
@@ -232,15 +229,6 @@ function editTodo(event) {
    setEditTodoFormData(todo);
    $editModal.dialog('open');
 }
-
-function setEditTodoFormData(todo) {
-   $todoEditForm[0].name.value = todo.title;	
-   if (todo.completed) {
-   	$todoEditForm[0]['checkbox-1'].setAttribute("checked",'');			
-   } else {
-   	$todoEditForm[0]['checkbox-1'].removeAttribute('checked');
-   }   
-}	
 
 function cancelEdit() {
    cleanForm($todoEditForm);
