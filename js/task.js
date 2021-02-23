@@ -11,7 +11,7 @@ const $todoEditForm = $('form[name="edit-todo"]');
 
 const ulTodoElement = document.querySelector('.js-list-todo');
 const $ulTodoElement = $('.js-list-todo');
-const $inputCheckbox = $('#checkbox-1');
+const $inputEditCheckbox = $('#checkbox-1');
 
 class TodoRequests {
 	static sendGetTodosRequest() {
@@ -105,22 +105,11 @@ class TodoLogic {
 		});
 	}
 
-	static updateStatusTodo(checked) {
-		const todo = getTodoFormData($todoEditForm);
-   	const id = todosRopository.selectedTodoId;
-   	const listElementId = ulTodoElement.querySelector(`li[data-id="${id}"]`);
- 
-		if (checked) todo.completed = !todo.completed;
-
-		const promise = TodoRequests.sendPutTodoRequest(id,todo);
-		promise.then(todo => { 
-	  		listElementId.classList.toggle('list-group-item-info');
-		});
-	}
-
 	static updateTodo() {
       const todo = getTodoFormData($todoEditForm);
       const id = todosRopository.selectedTodoId;
+
+      // 	if (checked) todo.completed = !todo.completed;
 
       const promise = TodoRequests.sendPutTodoRequest(id, todo);
        
@@ -134,9 +123,9 @@ class TodoLogic {
                return todo;
             });
 
-         const listElementId = ulTodoElement.querySelector(`li[data-id="${id}"]`);
+         const $listElementId = $(ulTodoElement).find(`li[data-id="${id}"]`);
 
-         listElementId.replaceWith(renderTodo(updateTodo));
+         $listElementId.replaceWith(renderTodo(updateTodo));
          cleanForm($todoEditForm);
          $editModal.dialog('close');
       });
@@ -148,8 +137,8 @@ class TodoLogic {
 
 		const promise = TodoRequests.sendDeleteTodoRequest(id);
 		promise.then(() => {
-			const listElementId = ulTodoElement.querySelector(`li[data-id="${id}"]`);
-			listElementId.remove();
+			const $listElementId = $(ulTodoElement).find(`li[data-id="${id}"]`);
+			$listElementId.remove();
 			todosRopository.todos = todosRopository.todos.filter(todo => todo.id !== id);
 		});
 	}
@@ -178,7 +167,7 @@ class TodoEvent {
 		ulTodoElement.addEventListener('click', (event) => {
 	   	if(event.target.classList.contains('bi-trash-fill')) {
 	      	TodoLogic.deleteTodo(event);
-	      	event.stopPropagation()
+	      	event.stopPropagation();
 	    	}
 	   },true)
 	}
@@ -189,12 +178,6 @@ class TodoEvent {
 	      	editTodo(event);
 	    	}
 	   })
-	}
-
-	static createCheckedEditEventListener() {
-		$inputCheckbox.click((event) => {
-		 	checkedTodo(event);
-		})
 	}
 
 	static createCancelEditEventListener() {
@@ -221,13 +204,16 @@ function createListElement(todo) {
 	list.dataset.id = todo.id;
 	list.textContent = todo.title;
 	const closeButton = `<i class="bi bi-trash-fill"></i>`;
+	const $checkboxList = $(`<input type="checkbox" disabled class="list-checkbox">`);
 	
 	if (todo.completed) {
 		list.classList.add('list-group-item-info');
+		$checkboxList.prop('checked', true);
 	}  
 
 	ulTodoElement.prepend(list);
-	return list.insertAdjacentHTML('beforeend', closeButton);
+	$checkboxList.appendTo(list);
+	list.insertAdjacentHTML('beforeend', closeButton);
 }
 
 // FORM UTILS
@@ -240,26 +226,23 @@ function getTodoFormData($form) {
    }
 }
 
-function	checkedTodo(event) {
-	const target = $( event.target );
-	if (target.is( "input" )) {
-   	const checked = target.is(":checked");
-   	TodoLogic.updateStatusTodo(checked);
-   }
-}
-
 function editTodo(event) {
    const listElement = event.target.closest('li');
    todosRopository.selectedTodoId = parseInt(listElement.dataset.id, 10);
    const todo = todosRopository.getTodoById(todosRopository.selectedTodoId);
-   
+
    setEditTodoFormData(todo);
    $editModal.dialog('open');
 }
 
 function setEditTodoFormData(todo) {
-   $todoEditForm[0].name.value = todo.title;				 
-}
+   $todoEditForm[0].name.value = todo.title;	
+   if (todo.completed) {
+   	$todoEditForm[0]['checkbox-1'].setAttribute("checked",'');			
+   } else {
+   	$todoEditForm[0]['checkbox-1'].removeAttribute('checked');
+   }   
+}	
 
 function cancelEdit() {
    cleanForm($todoEditForm);
@@ -280,12 +263,8 @@ function init() {
 	TodoEvent.createEditUserEventListener()
 	TodoEvent.createAddTodoModalEventListener();
 	TodoEvent.createAddTodoEventListener();
-	TodoEvent.createCheckedEditEventListener();
 	TodoEvent.createEditTodoEventListener();
 	TodoEvent.createDeleteTodoEventListener();
 	TodoEvent.createCancelEditEventListener();
 }
 init();
-
-
-
