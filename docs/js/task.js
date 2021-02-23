@@ -104,33 +104,34 @@ class TodoLogic {
 			$addModal.dialog("close");
 		});
 	}
-
+// ----------------------------------------------------
 	static updateTodo() {
       const todo = getTodoFormData($todoEditForm);
       const id = todosRopository.selectedTodoId;
+      const $checkbox = $todoEditForm[0]['checkbox-1'];
 
-      // 	if (checked) todo.completed = !todo.completed;
-
-      const promise = TodoRequests.sendPutTodoRequest(id, todo);
-       
-      promise.then(updateTodo => {
+      const promise = TodoRequests.sendPutTodoRequest(id, todo); 
+      promise.then(editTodo => {
          todosRopository.selectedTodoId = null;
 
          todosRopository.todos = todosRopository.todos.map(todo => {
+
             if(todo.id === id) {
-               return updateTodo;
+               return editTodo;
             }
                return todo;
             });
 
+         if ($($checkbox).is(':checked')) editTodo.completed = !editTodo.completed;
+
          const $listElementId = $(ulTodoElement).find(`li[data-id="${id}"]`);
 
-         $listElementId.replaceWith(renderTodo(updateTodo));
+         $listElementId.replaceWith(renderTodo(editTodo));
          cleanForm($todoEditForm);
          $editModal.dialog('close');
       });
    }
-
+// ----------------------------------------------------
 	static deleteTodo(event) {
 		const listElement = event.target.closest('li');
 		const id = parseInt(listElement.dataset.id, 10);
@@ -204,15 +205,12 @@ function createListElement(todo) {
 	list.dataset.id = todo.id;
 	list.textContent = todo.title;
 	const closeButton = `<i class="bi bi-trash-fill"></i>`;
-	const $checkboxList = $(`<input type="checkbox" disabled class="list-checkbox">`);
 	
 	if (todo.completed) {
 		list.classList.add('list-group-item-info');
-		$checkboxList.prop('checked', true);
 	}  
 
 	ulTodoElement.prepend(list);
-	$checkboxList.appendTo(list);
 	list.insertAdjacentHTML('beforeend', closeButton);
 }
 
