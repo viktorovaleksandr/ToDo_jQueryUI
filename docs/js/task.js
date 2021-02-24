@@ -67,11 +67,11 @@ class TodosRopository {
 class TodoUI {
    static initModals() {
       const baseModalOptions = {
-         autoOpen: false,
-			modal: true,
-			hide: {
-        		effect: "explode",
-        		duration: 800
+      autoOpen: false,
+		modal: true,
+		hide: {
+        	effect: "explode",
+        	duration: 800
       	}
       };
       $addModal.dialog(baseModalOptions);
@@ -108,19 +108,18 @@ class TodoLogic {
       const promise = TodoRequests.sendPutTodoRequest(id, todo); 
       promise.then(editTodo => {
          todosRopository.selectedTodoId = null;
-
          todosRopository.todos = todosRopository.todos.map(todo => {
 
-            if(todo.id === id) {
-               return editTodo;
-            }
-               return todo;
-            });
-         
-         if ($($checkbox).is(':checked')) editTodo.completed = !editTodo.completed;
-        
+         if(todo.id === id) {
+            return editTodo;
+         }
+            return todo;
+         });
+
          const $listElementId = $($ulTodoElement).find(`li[data-id="${id}"]`);
+         if ($($checkbox).is(':checked')) editTodo.completed = !editTodo.completed;
          $listElementId.replaceWith(renderTodo(editTodo));
+
          cleanForm($todoEditForm);
          $editModal.dialog('close');
       });
@@ -173,7 +172,7 @@ class TodoEvent {
 	}
 
 	static createDeleteTodoEventListener() {	
-		$ulTodoElement.delegate('.bi-x-circle',"click",function(event) {
+		$ulTodoElement.delegate('.bi-trash',"click",function(event) {
 			event.stopPropagation();
 	      TodoLogic.deleteTodo(event);
 	   })
