@@ -94,7 +94,8 @@ class TodoLogic {
 		
 		promise.then(todo => { 
 			cleanForm($todoAddForm);
-			todosRopository.todos.push(todo); 
+			// todosRopository.todos.push(todo); 
+			todosRopository.todos = [...todosRopository.todos,todo];
 			renderTodo(todo);
 			$addModal.dialog("close");
 		});
@@ -126,13 +127,14 @@ class TodoLogic {
    }
 
 	static deleteTodo(event) {
-		const listElement = event.target.closest('li');
+		const listElement = (event.target).closest('li');
 		const id = parseInt(listElement.dataset.id, 10);
 
 		const promise = TodoRequests.sendDeleteTodoRequest(id);
 		promise.then(() => {
-			const $listElementId = $($ulTodoElement).find(`li[data-id="${id}"]`);
-			$listElementId.remove();
+			const todoElement = document.querySelector('.js-list-todo');
+			const listElementId = todoElement.querySelector(`li[data-id="${id}"]`);
+			listElementId.remove();
 			todosRopository.todos = todosRopository.todos.filter(todo => todo.id !== id);
 		});
 	}
