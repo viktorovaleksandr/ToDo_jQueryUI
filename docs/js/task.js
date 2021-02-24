@@ -91,10 +91,11 @@ class TodoLogic {
 	static createTodos() {
 		const todo = getTodoFormData($todoAddForm);
 		const promise = TodoRequests.sendPostTodoRequest(todo);
+		const $checkbox = $todoAddForm[0]['js-checkbox-add'];
 		
 		promise.then(todo => { 
+         if ($($checkbox).is(':checked')) todo.completed = !todo.completed;
 			cleanForm($todoAddForm);
-			// todosRopository.todos.push(todo); 
 			todosRopository.todos = [...todosRopository.todos,todo];
 			renderTodo(todo);
 			$addModal.dialog("close");
@@ -104,7 +105,7 @@ class TodoLogic {
 	static updateTodo() {
       const todo = getTodoFormData($todoEditForm);
       const id = todosRopository.selectedTodoId;
-      const $checkbox = $todoEditForm[0]['js-checkbox'];
+      const $checkbox = $todoEditForm[0]['js-checkbox-edit'];
 
       const promise = TodoRequests.sendPutTodoRequest(id, todo); 
       promise.then(editTodo => {
@@ -217,8 +218,8 @@ function getTodoFormData($form) {
 function setEditTodoFormData(todo) {
    $todoEditForm[0].name.value = todo.title;	
    todo.completed
-   ?$todoEditForm[0]['js-checkbox'].setAttribute("checked",'')
-   :$todoEditForm[0]['js-checkbox'].removeAttribute('checked');		  
+   ?$todoEditForm[0]['js-checkbox-edit'].setAttribute("checked",'')
+   :$todoEditForm[0]['js-checkbox-edit'].removeAttribute('checked');		  
 }
 
 function setEditModal(event) {
